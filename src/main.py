@@ -1,14 +1,6 @@
 from nicegui import ui,app
 app.add_static_files('/img', 'img')
 
-def root():
-    # ui.sub_pages({
-    #     '/': home_page,
-    #     '/map/{lat}/{lon}': map_page, 
-
-    # }).classes('w-full')
-    home_page()
-
 def home_page():
 
     with ui.column().classes('w-full gap-0 bg-no-repeat bg-cover bg-[url(/img/background.png)]').style('height: calc(100vh)'):
