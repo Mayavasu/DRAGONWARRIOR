@@ -1,4 +1,4 @@
-from nicegui import ui, app  # type: ignore
+from nicegui import ui, app  #type: ignore
 
 app.add_static_files('/img', 'img')
 
