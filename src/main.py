@@ -1,4 +1,4 @@
-from nicegui import ui,app
+from nicegui import ui,app # type: ignore
 app.add_static_files('/img', 'img')
 
 def home_page():
@@ -6,7 +6,7 @@ def home_page():
     with ui.column().classes('w-full gap-0 bg-no-repeat bg-cover bg-[url(/img/background.png)]').style('height: calc(100vh)'):
         with ui.row().classes('w-full h-24'):
             ui.image('/img/logo.png').classes('h-24 w-32')
-            ui.label('label 2')
+            ui.label('')
             ui.label('label 3')
 
         with ui.row().classes('w-full h-40'):
