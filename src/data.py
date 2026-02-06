@@ -256,12 +256,14 @@ k
                 "coins": 10
             },
             {
-                "question":"", 
+                "question":'''
+Which sign makes the statement true?8 1/3 ? 8 1/3
+''', 
                 "choices": [
-                   "","",""
+                   ">","<","="
                 ],
-                "answer": "",
-                "coins": 15
+                "answer": "=",
+                "coins": 10
             },
             {
                 "question":"", 

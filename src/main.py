@@ -99,9 +99,7 @@ def home_page():
                 ui.label('100').classes('text-white text-bold inline-block align-middle text-xl text-italic')
             with ui.row().classes('items-center gap-4'):
                 ui.button('MY LESSONS').classes('').props('color=white size=xl outline padding=xs').style('padding-left: 15px; padding-right: 15px;')
-                ui.button('MY STUFF').classes('').props('color=white size=xl outline padding=xs').style('padding-left: 15px; padding-right: 15px;')
             with ui.row().classes('items-center gap-4'):
-                ui.button(icon='settings').classes('').props('q-btn round color="indigo.950"')
                 ui.button(icon='close', on_click=lambda: set_page("login")).classes('').props('q-btn round color="indigo.950"')
 
         with ui.row().classes('w-full h-40 justify-end pr-30 pt-10 pb-10'): 
