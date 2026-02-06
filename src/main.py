@@ -7,10 +7,19 @@ db = TinyDB('db.json')
 class Settings:
     def __init__(self):
         self.page = "login"
+        self.flashcard = False
         self.email = ""
         self.password = ""
         self.first_name = ""
         self.last_name = ""
+        self.topic = {}
+        self.question_text = ""
+        self.answer_element = None
+        self.question_no = -1
+        self.question_count = 0
+        self.question_label = ""
+        self.progress_percentage = 0
+        self.coins = 0
 
 settings = Settings() 
 
@@ -49,7 +58,7 @@ def check_signup():
         settings.page = 'login'
         
 
-def login_page():
+def login_page():    
     with ui.row().bind_visibility_from(settings, "page", backward=lambda x: x=="login").classes(
         'w-full gap-0 bg-no-repeat bg-cover bg-[url(/img/background.png)] items-center justify-center'
     ).style('height: calc(100vh)'):
@@ -96,9 +105,7 @@ def home_page():
                 ui.label().classes('inline-block align-middle text-white text-bold text-xl text-italic').bind_text_from(settings,"first_name")
             with ui.row().classes('items-center gap-4').style(''):
                 ui.image('/img/coin.png').classes('h-18 w-18')
-                ui.label('100').classes('text-white text-bold inline-block align-middle text-xl text-italic')
-            with ui.row().classes('items-center gap-4'):
-                ui.button('MY LESSONS').classes('').props('color=white size=xl outline padding=xs').style('padding-left: 15px; padding-right: 15px;')
+                ui.label().classes('text-white text-bold inline-block align-middle text-xl text-italic').bind_text_from(settings, 'coins')
             with ui.row().classes('items-center gap-4'):
                 ui.button(icon='close', on_click=lambda: set_page("login")).classes('').props('q-btn round color="indigo.950"')
 
@@ -113,17 +120,69 @@ def home_page():
                     ui.label('Lessons Completed This Week:  0').classes('text-italic')
 
         with ui.row().classes('w-full grow pl-30 pr-30 pb-30'):
-            with ui.column().classes('bg-indigo-950 w-full h-full p-5 rounded-xl'):
-                ui.label('RECOMMENDATIONS').classes('text-xl text-bold text-italic text-white')
+            with ui.column().classes('bg-indigo-950 w-full h-full p-5 rounded-xl').bind_visibility_from(settings, "flashcard", backward=lambda x: not x):
+                ui.label('MY LESSONS').classes('text-xl text-bold text-italic text-white')
                 with ui.grid(columns=4).classes('w-full gap-5 h-full p-10'):
                     for i in random.sample(topics, 8):  
-                        with ui.row().classes('bg-purple w-full h-full rounded-2xl'):
+                        with ui.row().classes('bg-purple w-full h-full rounded-2xl hover:border-5 border-sky-500').on('click', lambda x, i=i: select_card(i)):
                             with ui.card().tight().classes('h-full'):
                                 with ui.card_section().classes('bg-purple w-full h-25'):
                                     with ui.row().classes('items-center h-full w-full justify-center'):
                                         ui.label(i['topic']).classes('text-3xl text-bold text-white text-italic')    
                                 with ui.card_section():
                                     ui.label(i['description'])    
+
+            with ui.column().classes('bg-indigo-950 w-full h-full p-5 rounded-xl').bind_visibility_from(settings, "flashcard"):
+                with ui.row().classes('w-full items-center justify-between pr-10'):
+                    ui.label('QUESTIONS').classes('text-xl text-bold text-italic text-white').bind_text_from(settings,"question_label")
+                    ui.linear_progress(show_value = False, color = 'purple').bind_value_from(settings, 'progress_percentage').classes('w-100 h-7 border-indigo border-solid border-3')
+                    with ui.row().classes('items-center gap-4').style(''):
+                        ui.image('/img/coin.png').classes('h-16 w-16')
+                        ui.label().classes('text-white text-bold inline-block align-middle text-xl text-italic').bind_text_from(settings, "coins")
+                with ui.row().classes('w-full h-full bg-white rounded-xl'):
+                    with ui.column().classes('w-full h-full p-15'):
+                        with ui.row().classes('grow'):
+                            ui.label().bind_text_from(settings, "question_text").classes('text-3xl text-bold text-italic')
+                        with ui.row().classes('w-full'):
+                            settings.answer_element = ui.radio([]).props('inline').classes('text-md')                           
+                        with ui.row().classes('w-full h-25 mt-3 items-center justify-center'):
+                            ui.button('SUBMIT', color="purple", on_click=lambda: validate_answer())
+
+def validate_answer():
+    expected_answer = settings.topic["questions"][settings.question_no]["answer"]
+    actual_answer = settings.answer_element.value
+    if actual_answer is None:
+        ui.notify("Please select an answer!!", position="center", type="negative")
+    elif expected_answer == actual_answer:
+        coins = settings.topic["questions"][settings.question_no]["coins"]
+        ui.notify(f"Success!! Your earned {coins} coins", position="center", type="positive")
+        settings.coins += coins                
+        next_question()
+    else:
+        ui.notify("Wrong Answer!!", position="center", type="negative")
+        next_question()
+
+def next_question():
+    if settings.question_no+1 == settings.question_count:
+        settings.flashcard = False
+        settings.question_count = 0
+        settings.question_no = 0
+        ui.notify(f"Your earned {settings.coins} coins total", position="center", type="positive")
+        return
+    settings.question_no += 1
+    settings.question_label = f"QUESTIONS  {settings.question_no+1}/{settings.question_count}"
+    settings.progress_percentage = settings.question_no+1/settings.question_count
+    settings.question_text = settings.topic["questions"][settings.question_no]["question"]
+    settings.answer_element.set_value(None)
+    settings.answer_element.set_options(settings.topic["questions"][settings.question_no]["choices"])
+
+def select_card(card_input):
+    settings.topic = card_input
+    settings.flashcard = True
+    settings.question_count = len(settings.topic['questions'])
+    next_question()
+
+
 
 
 ui.add_css('''

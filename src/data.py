@@ -108,7 +108,7 @@ p
                 "choices": [
                    "Yes","No"
                 ],
-                "answer": "no",
+                "answer": "No",
                 "coins": 30
             },
             {
